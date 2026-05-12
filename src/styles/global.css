@@ -1,0 +1,125 @@
+/* ═══════════════════════════════════
+   GLOBAL STYLES
+   Warm monospace, mmguo-inspired
+═══════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+:root {
+  /* Warm palette */
+  --bg:       #f5f0eb;
+  --bg2:      #ece5dd;
+  --text:     #2c2420;
+  --muted:    #8a7e74;
+  --accent:   #c45b5b;
+  --accent2:  #d4838b;
+  --border:   #d6cdc4;
+  --link:     #2c2420;
+  --link-hover: #c45b5b;
+
+  /* Sakura colors */
+  --sakura-1: #ffc0cb;
+  --sakura-2: #ffb7c5;
+  --sakura-3: #f4a7b9;
+  --sakura-4: #f8d0d8;
+  --sakura-5: #fff0f3;
+
+  /* Typography */
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --font-size: 14px;
+  --line-height: 1.7;
+  --max-width: 680px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-mono);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Layout ── */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── Typography ── */
+h1, h2, h3 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: var(--link);
+  text-decoration-color: var(--border);
+  text-underline-offset: 3px;
+  transition: color 0.2s, text-decoration-color 0.2s;
+}
+
+a:hover {
+  color: var(--link-hover);
+  text-decoration-color: var(--link-hover);
+}
+
+/* ── Section dividers (mmguo style) ── */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Sections ── */
+section {
+  padding: 80px 0;
+}
+
+section:first-of-type {
+  padding-top: 0;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::selection {
+  background: var(--sakura-4);
+  color: var(--text);
+}
