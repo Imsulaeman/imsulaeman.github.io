@@ -3,7 +3,7 @@
    Warm monospace, mmguo-inspired
 ═══════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 
 :root {
   /* Warm palette */
@@ -25,10 +25,18 @@
   --sakura-5: #fff0f3;
 
   /* Typography */
+  --font-serif: 'Instrument Serif', Georgia, serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
   --font-size: 14px;
   --line-height: 1.7;
   --max-width: 680px;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-reveal: 600ms;
 }
 
 * {
@@ -68,7 +76,7 @@ a {
   color: var(--link);
   text-decoration-color: var(--border);
   text-underline-offset: 3px;
-  transition: color 0.2s, text-decoration-color 0.2s;
+  transition: color var(--duration-base), text-decoration-color var(--duration-base);
 }
 
 a:hover {
@@ -76,14 +84,14 @@ a:hover {
   text-decoration-color: var(--link-hover);
 }
 
-/* ── Section dividers (mmguo style) ── */
+/* ── Section dividers ── */
 .section-label {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 32px;
@@ -96,13 +104,33 @@ a:hover {
   background: var(--border);
 }
 
-/* ── Sections ── */
+/* ── Sections — varied rhythm, not uniform ── */
 section {
   padding: 80px 0;
 }
 
 section:first-of-type {
   padding-top: 0;
+}
+
+#projects    { padding: 96px 0; }
+#writings    { padding: 64px 0; }
+#shapes-me   { padding: 96px 0; }
+.contact     { padding: 80px 0 48px; }
+
+/* ── Scroll-reveal ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--duration-reveal) var(--ease-out-expo),
+    transform var(--duration-reveal) var(--ease-out-expo);
+  transition-delay: var(--delay, 0ms);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* ── Scrollbar ── */
@@ -122,4 +150,17 @@ section:first-of-type {
 ::selection {
   background: var(--sakura-4);
   color: var(--text);
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

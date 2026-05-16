@@ -1,860 +1,234 @@
 ---
-// Pixel art sakura scene — four seasons, hill, character with book
+// Interactive reading container — floating sakura petals, shake on click
 ---
 
-<div class="sakura-wrap">
-  <canvas id="sakura-canvas"></canvas>
-  <div class="season-indicator" id="season-label">spring</div>
+<div class="globe-outer" id="globe-outer" role="button" aria-label="Click to shake" tabindex="0">
+  <div class="globe-container" id="globe-container">
+    <video
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      class="reading-video"
+      aria-hidden="true"
+    >
+      <source src="/assets/Reading-animated.mp4" type="video/mp4" />
+    </video>
+    <canvas class="petal-canvas" id="petal-canvas" aria-hidden="true"></canvas>
+  </div>
+  <p class="globe-hint">click to shake</p>
 </div>
 
 <style>
-  .sakura-wrap {
+  .globe-outer {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    margin: 48px 0 16px;
+    align-items: flex-start;
+    margin: 48px 0 8px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .globe-container {
     position: relative;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow:
+      0 2px 8px -2px rgba(44, 36, 32, 0.06),
+      0 8px 32px -8px rgba(44, 36, 32, 0.08);
+    transition: box-shadow 0.3s var(--ease-out-expo);
   }
 
-  #sakura-canvas {
-    width: 480px;
-    height: 360px;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    border-radius: 8px;
+  .globe-outer:hover .globe-container {
+    box-shadow:
+      0 4px 16px -4px rgba(44, 36, 32, 0.1),
+      0 16px 48px -12px rgba(44, 36, 32, 0.12);
   }
 
-  .season-indicator {
+  .globe-container.shaking {
+    animation: globe-shake 0.55s var(--ease-out-expo);
+  }
+
+  .reading-video {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .petal-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .globe-hint {
     margin-top: 8px;
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 0.1em;
     color: var(--muted);
     font-family: var(--font-mono);
-    transition: opacity 0.3s;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  .globe-outer:hover .globe-hint {
+    opacity: 1;
+  }
+
+  @keyframes globe-shake {
+    0%   { transform: translateX(0)    rotate(0deg); }
+    12%  { transform: translateX(-7px) rotate(-1.2deg); }
+    24%  { transform: translateX(6px)  rotate(1deg); }
+    36%  { transform: translateX(-5px) rotate(-0.8deg); }
+    48%  { transform: translateX(4px)  rotate(0.6deg); }
+    62%  { transform: translateX(-2px) rotate(-0.3deg); }
+    76%  { transform: translateX(1px)  rotate(0.1deg); }
+    100% { transform: translateX(0)    rotate(0deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .globe-container.shaking {
+      animation: none;
+    }
+    .petal-canvas {
+      display: none;
+    }
+    .globe-hint {
+      display: none;
+    }
   }
 
   @media (max-width: 600px) {
-    #sakura-canvas {
-      width: 100%;
-      height: auto;
-      aspect-ratio: 4 / 3;
+    .globe-container {
+      max-width: 100%;
     }
   }
 </style>
 
 <script>
-  const canvas = document.getElementById('sakura-canvas') as HTMLCanvasElement;
-  const ctx = canvas.getContext('2d')!;
-  const seasonLabel = document.getElementById('season-label')!;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!prefersReduced) {
+    const outer     = document.getElementById('globe-outer')!;
+    const container = document.getElementById('globe-container')!;
+    const canvas    = document.getElementById('petal-canvas') as HTMLCanvasElement;
+    const ctx       = canvas.getContext('2d')!;
 
-  const W = 160;
-  const H = 120;
-  canvas.width = W;
-  canvas.height = H;
+    const COLORS = ['#ffc0cb', '#ffb7c5', '#f4a7b9', '#f8d0d8', '#ffe0e8'];
 
-  // ── Season palettes ──
-  const SEASONS = {
-    spring: {
-      sky:       ['#f2e6dc', '#f8f0e8'],
-      hill:      ['#7db866', '#6aaa54', '#5c9a48'],
-      hillDark:  ['#4d8035', '#3d7028'],
-      hillEdge:  '#3a6025',
-      foliageOut:'#6a4c7a',   // dark purple outline
-      foliage:   ['#e8a8c8', '#f0b8d0', '#d898b8', '#c888a8'],  // mid pinks
-      foliageHi: ['#ffd8e8', '#ffe8f0', '#fff0f3'],             // highlights (top)
-      foliageSh: ['#b078a0', '#9a6890', '#8a5880'],             // shadows (bottom)
-      trunk:     ['#8a5868', '#7a4858', '#6a3848'],
-      trunkOut:  '#4a2838',
-      particles: ['#ffb7c5', '#ffc0cb', '#ffd6e0', '#fff0f3'],
-      particleType: 'petal' as const,
-      label: 'spring',
-    },
-    summer: {
-      sky:       ['#dce6e8', '#e4eef0'],
-      hill:      ['#5aad3e', '#4d9d34', '#3f8a28'],
-      hillDark:  ['#358020', '#2a701a'],
-      hillEdge:  '#1e5a12',
-      foliageOut:'#2a5520',
-      foliage:   ['#5cb84a', '#6cc85a', '#4da83e', '#58b048'],
-      foliageHi: ['#8ae07a', '#a0f090', '#b0f8a0'],
-      foliageSh: ['#3a8828', '#2e7820', '#246818'],
-      trunk:     ['#6b4535', '#5b3525', '#7b5545'],
-      trunkOut:  '#3a2015',
-      particles: ['#fff8a0', '#ffee70'],
-      particleType: 'firefly' as const,
-      label: 'summer',
-    },
-    autumn: {
-      sky:       ['#e8d8c8', '#f0e0d0'],
-      hill:      ['#c4a040', '#b89035', '#a8802a'],
-      hillDark:  ['#987020', '#886018'],
-      hillEdge:  '#785010',
-      foliageOut:'#6a3010',
-      foliage:   ['#e87830', '#d06828', '#f09040', '#c85820'],
-      foliageHi: ['#f8b060', '#f8c070', '#fad888'],
-      foliageSh: ['#a04818', '#904010', '#803808'],
-      trunk:     ['#6b4535', '#5b3525', '#7b5545'],
-      trunkOut:  '#3a2015',
-      particles: ['#e87830', '#d06828', '#f09040', '#c85820'],
-      particleType: 'leaf' as const,
-      label: 'autumn',
-    },
-    winter: {
-      sky:       ['#d8dce8', '#e2e6f0'],
-      hill:      ['#c8d0c0', '#b8c4b0', '#c0c8b8'],
-      hillDark:  ['#a0b098', '#90a488'],
-      hillEdge:  '#809878',
-      foliageOut:'#706070',
-      foliage:   ['#c0a8b0', '#b098a0', '#c8b0b8', '#b8a0a8'],
-      foliageHi: ['#e0d0d8', '#e8d8e0', '#f0e8f0'],
-      foliageSh: ['#907880', '#886878', '#806068'],
-      trunk:     ['#6b4535', '#5b3525', '#7b5545'],
-      trunkOut:  '#3a2015',
-      particles: ['#ffffff', '#eef0ff', '#dde0f0', '#f0f0ff'],
-      particleType: 'snow' as const,
-      label: 'winter',
-    },
-  };
-
-  type SeasonKey = keyof typeof SEASONS;
-  const SEASON_ORDER: SeasonKey[] = ['spring', 'summer', 'autumn', 'winter'];
-  const SEASON_DURATION = 360;
-  const TRANSITION_DURATION = 120;
-
-  // ── Particle system ──
-  interface Particle {
-    x: number; y: number;
-    vx: number; vy: number;
-    size: number; color: string;
-    opacity: number; life: number; maxLife: number;
-    wobble: number; wobbleSpeed: number;
-  }
-  const particles: Particle[] = [];
-
-  // ── Character state ──
-  const GUY = {
-    x: 5, y: 0,
-    targetX: 92,
-    state: 'running' as 'running' | 'sitting',
-    frame: 0,
-    arrived: false,
-  };
-
-  // ── Hill shape ──
-  function hillY(x: number): number {
-    const cx = 100;
-    const peakY = 74;
-    const spread = 95;
-    const base = 112;
-    const h = base - (base - peakY) * Math.exp(-((x - cx) ** 2) / (2 * spread * spread));
-    return Math.floor(h);
-  }
-
-  // ── Color helpers ──
-  function hexToRgb(hex: string): [number, number, number] {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return [r, g, b];
-  }
-
-  function rgbToHex(r: number, g: number, b: number): string {
-    return '#' + [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
-  }
-
-  function lerpColor(a: string, b: string, t: number): string {
-    const [ar, ag, ab] = hexToRgb(a);
-    const [br, bg, bb] = hexToRgb(b);
-    return rgbToHex(ar + (br - ar) * t, ag + (bg - ag) * t, ab + (bb - ab) * t);
-  }
-
-  function lerpPalette(a: string[], b: string[], t: number): string[] {
-    const len = Math.max(a.length, b.length);
-    const result: string[] = [];
-    for (let i = 0; i < len; i++) {
-      const ca = a[Math.min(i, a.length - 1)];
-      const cb = b[Math.min(i, b.length - 1)];
-      result.push(lerpColor(ca, cb, t));
-    }
-    return result;
-  }
-
-  function getCurrentPalette(frame: number) {
-    const totalCycle = SEASON_ORDER.length * SEASON_DURATION;
-    const f = frame % totalCycle;
-    const seasonIdx = Math.floor(f / SEASON_DURATION);
-    const seasonProgress = (f % SEASON_DURATION) / SEASON_DURATION;
-
-    const current = SEASONS[SEASON_ORDER[seasonIdx]];
-    const next = SEASONS[SEASON_ORDER[(seasonIdx + 1) % SEASON_ORDER.length]];
-
-    const transStart = 1 - (TRANSITION_DURATION / SEASON_DURATION);
-    let t = 0;
-    let label = current.label;
-
-    if (seasonProgress > transStart) {
-      t = (seasonProgress - transStart) / (1 - transStart);
-      t = t * t * (3 - 2 * t);
-    }
-    if (t > 0.5) label = next.label;
-
-    return {
-      sky: lerpPalette(current.sky, next.sky, t),
-      hill: lerpPalette(current.hill, next.hill, t),
-      hillDark: lerpPalette(current.hillDark, next.hillDark, t),
-      hillEdge: lerpColor(current.hillEdge, next.hillEdge, t),
-      foliageOut: lerpColor(current.foliageOut, next.foliageOut, t),
-      foliage: lerpPalette(current.foliage, next.foliage, t),
-      foliageHi: lerpPalette(current.foliageHi, next.foliageHi, t),
-      foliageSh: lerpPalette(current.foliageSh, next.foliageSh, t),
-      trunk: lerpPalette(current.trunk, next.trunk, t),
-      trunkOut: lerpColor(current.trunkOut, next.trunkOut, t),
-      particles: lerpPalette(current.particles, next.particles, t),
-      particleType: t < 0.5 ? current.particleType : next.particleType,
-      label,
-    };
-  }
-
-  type Pal = ReturnType<typeof getCurrentPalette>;
-
-  // ── Pixel buffer for outline technique ──
-  // We draw to an offscreen buffer so we can do outline passes
-  const buf = ctx.createImageData(W, H);
-  const EMPTY = 0;
-
-  function bufClear() {
-    buf.data.fill(0);
-  }
-
-  function bufSet(x: number, y: number, hex: string, alpha = 255) {
-    x = Math.floor(x); y = Math.floor(y);
-    if (x < 0 || x >= W || y < 0 || y >= H) return;
-    const i = (y * W + x) * 4;
-    const [r, g, b] = hexToRgb(hex);
-    buf.data[i] = r;
-    buf.data[i + 1] = g;
-    buf.data[i + 2] = b;
-    buf.data[i + 3] = alpha;
-  }
-
-  function bufGet(x: number, y: number): number {
-    if (x < 0 || x >= W || y < 0 || y >= H) return EMPTY;
-    return buf.data[(y * W + x) * 4 + 3];
-  }
-
-  // ── Drawing helpers ──
-  function px(x: number, y: number, color: string) {
-    ctx.fillStyle = color;
-    ctx.fillRect(Math.floor(x), Math.floor(y), 1, 1);
-  }
-
-  function block(x: number, y: number, w: number, h: number, color: string) {
-    ctx.fillStyle = color;
-    ctx.fillRect(Math.floor(x), Math.floor(y), w, h);
-  }
-
-  // ── Draw sky with smooth gradient ──
-  function drawSky(pal: Pal) {
-    for (let y = 0; y < H; y++) {
-      ctx.fillStyle = lerpColor(pal.sky[0], pal.sky[1], y / H);
-      ctx.fillRect(0, y, W, 1);
-    }
-  }
-
-  // ── Draw hill with smooth horizontal bands ──
-  function drawHill(pal: Pal) {
-    // Find the topmost hill point
-    let minHY = H;
-    for (let x = 0; x < W; x++) {
-      const hy = hillY(x);
-      if (hy < minHY) minHY = hy;
+    interface Petal {
+      x: number; y: number;
+      vx: number; vy: number;
+      baseVy: number;
+      wobble: number; wobbleSpeed: number;
+      size: number; color: string;
+      opacity: number; rotation: number; rotSpeed: number;
     }
 
-    // Draw hill body with horizontal color bands (no vertical stripes)
-    for (let x = 0; x < W; x++) {
-      const hy = hillY(x);
-      const depth = H - hy; // how tall the hill column is here
-      for (let y = hy; y < H; y++) {
-        const distFromTop = y - hy;
-        const t = depth > 0 ? distFromTop / depth : 0;
-        // Top ~40% = light grass, bottom = dark
-        let color: string;
-        if (t < 0.12) {
-          color = pal.hill[0];
-        } else if (t < 0.35) {
-          color = pal.hill[1];
-        } else if (t < 0.55) {
-          color = pal.hill[Math.min(2, pal.hill.length - 1)];
-        } else if (t < 0.75) {
-          color = pal.hillDark[0];
-        } else {
-          color = pal.hillDark[Math.min(1, pal.hillDark.length - 1)];
-        }
-        px(x, y, color);
-      }
+    let petals: Petal[] = [];
+    let W = 0, H = 0;
+    let rafId = 0;
+
+    function resize() {
+      const r = container.getBoundingClientRect();
+      W = r.width;
+      H = r.height;
+      canvas.width  = W;
+      canvas.height = H;
     }
 
-    // Hill top edge (1px dark outline on the top contour)
-    for (let x = 0; x < W; x++) {
-      const hy = hillY(x);
-      px(x, hy, pal.hillEdge);
+    function makePetal(burst = false): Petal {
+      return {
+        x:           burst ? W * 0.2 + Math.random() * W * 0.6 : Math.random() * W,
+        y:           burst ? H * 0.2 + (Math.random() - 0.5) * H * 0.5 : -8,
+        vx:          (Math.random() - 0.5) * (burst ? 5 : 0.4),
+        vy:          burst ? (Math.random() - 0.5) * 5 : 0.35 + Math.random() * 0.45,
+        baseVy:      0.35 + Math.random() * 0.45,
+        wobble:      Math.random() * Math.PI * 2,
+        wobbleSpeed: 0.012 + Math.random() * 0.018,
+        size:        2.5 + Math.random() * 3,
+        color:       COLORS[Math.floor(Math.random() * COLORS.length)],
+        opacity:     0.45 + Math.random() * 0.4,
+        rotation:    Math.random() * Math.PI * 2,
+        rotSpeed:    (Math.random() - 0.5) * 0.04,
+      };
     }
 
-    // Small grass tufts
-    for (let x = 2; x < W; x += 5) {
-      const hy = hillY(x);
-      if (hy < H - 3) {
-        px(x, hy - 1, pal.hill[0]);
-        if ((x * 7 + 3) % 11 > 5) {
-          px(x + 1, hy - 1, pal.hill[1]);
-        }
-      }
-    }
-  }
-
-  // ── Foliage blob: outline + zone shading ──
-  // Draws a cloud-like blob with:
-  //   1) Dark outline border
-  //   2) Highlight zone on top portion
-  //   3) Mid color in center
-  //   4) Shadow zone on bottom portion
-  function drawFoliageBlob(
-    cx: number, cy: number, rx: number, ry: number,
-    pal: Pal, bumpy = true
-  ) {
-    // Step 1: Determine which pixels are "inside" the blob
-    const inside: boolean[][] = [];
-    const minX = cx - rx - 2;
-    const maxX = cx + rx + 2;
-    const minY = cy - ry - 2;
-    const maxY = cy + ry + 2;
-
-    for (let y = minY; y <= maxY; y++) {
-      inside[y - minY] = [];
-      for (let x = minX; x <= maxX; x++) {
-        // Ellipse test with bumpy edge
-        let dx = (x - cx) / rx;
-        let dy = (y - cy) / ry;
-        let dist = dx * dx + dy * dy;
-
-        // Add bumpiness for cloud-like edge
-        if (bumpy) {
-          const angle = Math.atan2(y - cy, x - cx);
-          const bump = Math.sin(angle * 3.5) * 0.12 + Math.sin(angle * 7) * 0.06;
-          dist += bump;
-        }
-
-        inside[y - minY][x - minX] = dist < 1.0;
-      }
-    }
-
-    // Step 2: Draw outline — pixels that are inside but adjacent to outside
-    for (let y = minY; y <= maxY; y++) {
-      for (let x = minX; x <= maxX; x++) {
-        const iy = y - minY;
-        const ix = x - minX;
-        if (!inside[iy]?.[ix]) continue;
-
-        // Check if any neighbor is outside (= edge pixel)
-        const isEdge =
-          !inside[iy - 1]?.[ix] ||
-          !inside[iy + 1]?.[ix] ||
-          !inside[iy]?.[ix - 1] ||
-          !inside[iy]?.[ix + 1];
-
-        if (isEdge) {
-          px(x, y, pal.foliageOut);
-        }
-      }
-    }
-
-    // Step 3: Fill interior with zone-based shading
-    for (let y = minY; y <= maxY; y++) {
-      for (let x = minX; x <= maxX; x++) {
-        const iy = y - minY;
-        const ix = x - minX;
-        if (!inside[iy]?.[ix]) continue;
-
-        // Skip edge pixels (already drawn as outline)
-        const isEdge =
-          !inside[iy - 1]?.[ix] ||
-          !inside[iy + 1]?.[ix] ||
-          !inside[iy]?.[ix - 1] ||
-          !inside[iy]?.[ix + 1];
-        if (isEdge) continue;
-
-        // Vertical position within blob determines shading zone
-        const t = (y - (cy - ry)) / (2 * ry); // 0 = top, 1 = bottom
-
-        let color: string;
-        if (t < 0.25) {
-          // Top highlight zone
-          color = pal.foliageHi[Math.min(Math.floor((x + y) % pal.foliageHi.length), pal.foliageHi.length - 1)];
-        } else if (t < 0.6) {
-          // Mid zone
-          color = pal.foliage[Math.abs((x + y * 2)) % pal.foliage.length];
-        } else {
-          // Shadow zone
-          color = pal.foliageSh[Math.abs((x * 3 + y)) % pal.foliageSh.length];
-        }
-
-        px(x, y, color);
-      }
-    }
-  }
-
-  // ── Draw tree ──
-  function drawTree(pal: Pal) {
-    const tx = 100;
-    const ty = hillY(tx);
-
-    // === Trunk ===
-    // Trunk outline
-    const trunkLeft = tx - 3;
-    const trunkRight = tx + 3;
-    const trunkTop = ty - 34;
-    const trunkBot = ty;
-
-    // Outline
-    for (let y = trunkTop - 1; y <= trunkBot; y++) {
-      px(trunkLeft - 1, y, pal.trunkOut);
-      px(trunkRight, y, pal.trunkOut);
-    }
-    for (let x = trunkLeft - 1; x <= trunkRight; x++) {
-      px(x, trunkBot, pal.trunkOut);
-    }
-
-    // Trunk fill with zone shading (left=shadow, center=mid, right=highlight)
-    for (let y = trunkTop; y < trunkBot; y++) {
-      for (let x = trunkLeft; x < trunkRight; x++) {
-        const t = (x - trunkLeft) / (trunkRight - trunkLeft);
-        let ci: number;
-        if (t < 0.3) ci = 2;       // dark left
-        else if (t < 0.65) ci = 0;  // mid center
-        else ci = 1;                // slightly different right
-        px(x, y, pal.trunk[Math.min(ci, pal.trunk.length - 1)]);
-      }
-    }
-
-    // Bark texture — subtle horizontal lines
-    for (let y = trunkTop + 3; y < trunkBot - 2; y += 4) {
-      px(trunkLeft, y, pal.trunkOut);
-      px(trunkLeft + 1, y, pal.trunkOut);
-    }
-    for (let y = trunkTop + 5; y < trunkBot - 2; y += 5) {
-      px(trunkRight - 2, y, pal.trunkOut);
-      px(trunkRight - 1, y, pal.trunkOut);
-    }
-
-    // === Roots ===
-    // Left root
-    block(tx - 6, ty - 2, 4, 2, pal.trunk[0]);
-    px(tx - 7, ty - 1, pal.trunk[2]);
-    px(tx - 6, ty - 2, pal.trunkOut);
-    px(tx - 7, ty - 1, pal.trunkOut);
-
-    // Right root
-    block(tx + 3, ty - 2, 4, 2, pal.trunk[0]);
-    px(tx + 7, ty - 1, pal.trunk[2]);
-    px(tx + 6, ty - 2, pal.trunkOut);
-    px(tx + 7, ty - 1, pal.trunkOut);
-
-    // === Branches (simple, mostly hidden by foliage) ===
-    const drawBranch = (x1: number, y1: number, x2: number, y2: number) => {
-      // Bresenham-style thick line
-      const dx = Math.abs(x2 - x1);
-      const dy = Math.abs(y2 - y1);
-      const sx = x1 < x2 ? 1 : -1;
-      const sy = y1 < y2 ? 1 : -1;
-      let err = dx - dy;
-      let cx = x1, cy = y1;
-      while (true) {
-        px(cx, cy, pal.trunk[0]);
-        px(cx, cy + 1, pal.trunk[1]);
-        // Outline on top
-        px(cx, cy - 1, pal.trunkOut);
-        if (cx === x2 && cy === y2) break;
-        const e2 = 2 * err;
-        if (e2 > -dy) { err -= dy; cx += sx; }
-        if (e2 < dx) { err += dx; cy += sy; }
-      }
-    };
-
-    // Visible branch stubs
-    drawBranch(tx - 2, ty - 34, tx - 14, ty - 40);
-    drawBranch(tx + 2, ty - 33, tx + 14, ty - 39);
-    drawBranch(tx, ty - 36, tx - 6, ty - 44);
-    drawBranch(tx + 1, ty - 35, tx + 8, ty - 43);
-
-    // === Foliage canopy — overlapping cloud-like blobs ===
-    // Each blob: centerX, centerY, radiusX, radiusY
-    // Arranged to form a round, cloud-like canopy
-    const blobs: [number, number, number, number][] = [
-      // Bottom row (widest)
-      [tx - 18, ty - 40, 10, 7],
-      [tx + 18, ty - 40, 10, 7],
-      [tx - 8,  ty - 38, 11, 8],
-      [tx + 8,  ty - 38, 11, 8],
-      // Middle row
-      [tx - 14, ty - 48, 10, 8],
-      [tx + 14, ty - 48, 10, 8],
-      [tx,      ty - 46, 13, 9],
-      // Upper row
-      [tx - 8,  ty - 55, 9, 7],
-      [tx + 8,  ty - 55, 9, 7],
-      [tx,      ty - 54, 10, 8],
-      // Crown
-      [tx - 4,  ty - 60, 7, 6],
-      [tx + 4,  ty - 60, 7, 6],
-      [tx,      ty - 63, 6, 5],
-    ];
-
-    // Draw blobs back-to-front (lower ones first so upper overlaps)
-    // Sort by y descending so lower blobs draw first
-    const sorted = [...blobs].sort((a, b) => b[1] - a[1]);
-    for (const [bx, by, brx, bry] of sorted) {
-      drawFoliageBlob(bx, by, brx, bry, pal);
-    }
-
-    // Small detail highlights — a few bright pixels scattered in upper canopy
-    const detailSeeds = [
-      [tx - 3, ty - 60], [tx + 5, ty - 58], [tx - 10, ty - 52],
-      [tx + 12, ty - 50], [tx, ty - 56], [tx - 7, ty - 48],
-      [tx + 7, ty - 47], [tx - 15, ty - 44], [tx + 15, ty - 43],
-    ];
-    for (const [dx, dy] of detailSeeds) {
-      px(dx, dy, pal.foliageHi[0]);
-      px(dx + 1, dy, pal.foliageHi[Math.min(1, pal.foliageHi.length - 1)]);
-    }
-
-    // === Shadow under tree (on the hill) ===
-    ctx.globalAlpha = 0.12;
-    for (let dx = -10; dx <= 10; dx++) {
-      const sx = tx + dx;
-      const sy = hillY(sx);
-      const intensity = 1 - Math.abs(dx) / 12;
-      if (intensity > 0) {
-        ctx.globalAlpha = 0.12 * intensity;
-        block(sx, sy - 1, 1, 3, '#000000');
-      }
-    }
-    ctx.globalAlpha = 1;
-  }
-
-  // ── Draw character ──
-  function drawCharacter(pal: Pal, frame: number) {
-    const gx = Math.floor(GUY.x);
-    const gy = hillY(gx);
-
-    const outC = '#2c1a10'; // dark outline for character
-    const skinC = '#f0cca8';
-    const skinShC = '#d4a878';
-    const hairC = '#3a2820';
-    const jacketC = '#7a5a48';
-    const jacketLiC = '#9a7a60';
-    const jacketShC = '#5a3a28';
-    const pantsC = '#3a3040';
-    const pantsLiC = '#4a4050';
-    const shoeC = '#2a1a10';
-    const bookC = '#c84840';
-    const bookPgC = '#f0e8d0';
-
-    if (GUY.state === 'running') {
-      const rf = Math.floor(frame / 8) % 4;
-
-      // -- Head outline + fill --
-      // Hair (top)
-      for (let x = -1; x <= 4; x++) px(gx + x, gy - 12, outC);
-      block(gx - 1, gy - 12, 6, 1, hairC);
-      px(gx - 2, gy - 12, outC);
-      px(gx + 5, gy - 12, outC);
-
-      // Head sides outline
-      px(gx - 2, gy - 11, outC);
-      px(gx - 2, gy - 10, outC);
-      px(gx + 5, gy - 11, outC);
-      px(gx + 5, gy - 10, outC);
-
-      // Head fill
-      block(gx - 1, gy - 11, 6, 1, hairC);  // hair lower
-      block(gx - 1, gy - 10, 6, 3, skinC);   // face
-      px(gx - 1, gy - 10, skinShC);          // face shadow left
-
-      // Head bottom outline
-      px(gx - 2, gy - 7, outC);
-      px(gx + 5, gy - 7, outC);
-      for (let x = -1; x <= 4; x++) px(gx + x, gy - 7, outC);
-
-      // Eye
-      px(gx + 2, gy - 9, outC);
-
-      // -- Body (jacket) --
-      // Outline
-      px(gx - 2, gy - 6, outC);
-      px(gx + 5, gy - 6, outC);
-      px(gx - 2, gy - 5, outC);
-      px(gx + 5, gy - 5, outC);
-      px(gx - 2, gy - 4, outC);
-      px(gx + 5, gy - 4, outC);
-      px(gx - 2, gy - 3, outC);
-      px(gx + 5, gy - 3, outC);
-
-      // Fill
-      block(gx - 1, gy - 6, 6, 4, jacketC);
-      // Highlight center
-      block(gx + 1, gy - 6, 2, 4, jacketLiC);
-      // Shadow left edge
-      px(gx - 1, gy - 6, jacketShC);
-      px(gx - 1, gy - 5, jacketShC);
-
-      // Book in hand (right side)
-      block(gx + 5, gy - 5, 2, 3, bookC);
-      px(gx + 5, gy - 4, bookPgC);
-      // Book outline
-      px(gx + 7, gy - 5, outC);
-      px(gx + 7, gy - 4, outC);
-      px(gx + 7, gy - 3, outC);
-
-      // -- Legs with walk cycle --
-      if (rf === 0 || rf === 2) {
-        // Standing / mid stride
-        px(gx - 1, gy - 2, outC); // outline
-        block(gx, gy - 2, 2, 3, pantsC);
-        px(gx + 2, gy - 2, outC);
-        block(gx + 2, gy - 2, 2, 3, pantsC);
-        px(gx + 4, gy - 2, outC);
-        // Shoes
-        px(gx, gy + 1, shoeC);
-        px(gx + 1, gy + 1, shoeC);
-        px(gx + 2, gy + 1, shoeC);
-        px(gx + 3, gy + 1, shoeC);
-      } else if (rf === 1) {
-        // Left forward, right back
-        block(gx - 1, gy - 2, 2, 3, pantsC);
-        block(gx + 3, gy - 2, 2, 3, pantsLiC);
-        px(gx - 2, gy - 2, outC);
-        px(gx + 5, gy - 2, outC);
-        px(gx - 1, gy + 1, shoeC);
-        px(gx + 3, gy + 1, shoeC);
-      } else {
-        // Right forward, left back
-        block(gx + 1, gy - 2, 2, 3, pantsLiC);
-        block(gx + 3, gy - 2, 2, 3, pantsC);
-        px(gx, gy - 2, outC);
-        px(gx + 5, gy - 2, outC);
-        px(gx + 1, gy + 1, shoeC);
-        px(gx + 4, gy + 1, shoeC);
-      }
-
-    } else {
-      // === Sitting & reading ===
-      const sx = gx;
-      const sy = hillY(sx);
-
-      // Head
-      for (let x = -1; x <= 4; x++) px(sx + x, sy - 10, outC);
-      px(sx - 2, sy - 10, outC);
-      px(sx + 5, sy - 10, outC);
-      block(sx - 1, sy - 10, 6, 1, hairC);
-      px(sx - 2, sy - 9, outC);
-      px(sx + 5, sy - 9, outC);
-      px(sx - 2, sy - 8, outC);
-      px(sx + 5, sy - 8, outC);
-      block(sx - 1, sy - 9, 6, 1, hairC);
-      block(sx - 1, sy - 8, 6, 2, skinC);
-      px(sx - 1, sy - 8, skinShC);
-
-      // Eye
-      px(sx + 1, sy - 7, outC);
-
-      // Bottom of head
-      for (let x = -1; x <= 4; x++) px(sx + x, sy - 6, outC);
-
-      // Body (seated, leaning)
-      px(sx - 2, sy - 5, outC);
-      px(sx + 5, sy - 5, outC);
-      px(sx - 2, sy - 4, outC);
-      px(sx + 5, sy - 4, outC);
-      px(sx - 2, sy - 3, outC);
-      px(sx + 5, sy - 3, outC);
-      block(sx - 1, sy - 5, 6, 3, jacketC);
-      block(sx + 1, sy - 5, 2, 3, jacketLiC);
-      px(sx - 1, sy - 5, jacketShC);
-
-      // Legs stretched out to the left
-      block(sx - 6, sy - 2, 7, 2, pantsC);
-      px(sx - 7, sy - 2, outC);
-      px(sx - 7, sy - 1, outC);
-      px(sx + 1, sy - 2, outC);
-      // Top/bottom outline for legs
-      for (let x = -6; x <= 0; x++) {
-        px(sx + x, sy - 3, outC);
-        px(sx + x, sy, outC);
-      }
-
-      // Shoes
-      block(sx - 8, sy - 2, 2, 2, shoeC);
-      px(sx - 9, sy - 1, outC);
-      px(sx - 9, sy - 2, outC);
-
-      // Arm holding book
-      block(sx - 2, sy - 4, 2, 2, skinC);
-      px(sx - 3, sy - 4, outC);
-      px(sx - 3, sy - 3, outC);
-
-      // Open book being read
-      block(sx - 6, sy - 5, 3, 3, bookC);
-      px(sx - 5, sy - 4, bookPgC);
-      px(sx - 4, sy - 4, bookPgC);
-      // Book outline
-      px(sx - 7, sy - 5, outC);
-      px(sx - 7, sy - 4, outC);
-      px(sx - 7, sy - 3, outC);
-      px(sx - 6, sy - 6, outC);
-      px(sx - 5, sy - 6, outC);
-      px(sx - 4, sy - 6, outC);
-      px(sx - 3, sy - 5, outC);
-    }
-  }
-
-  // ── Particles ──
-  function spawnParticle(pal: Pal) {
-    const tx = 100;
-    const ty = hillY(tx);
-    const colors = pal.particles;
-    const type = pal.particleType;
-
-    let x: number, y: number, vx: number, vy: number, maxLife: number, size: number;
-
-    if (type === 'petal') {
-      x = tx + (Math.random() - 0.5) * 50;
-      y = ty - 40 - Math.random() * 30;
-      vx = 0.1 + Math.random() * 0.15;
-      vy = 0.08 + Math.random() * 0.1;
-      maxLife = 200 + Math.random() * 200;
-      size = 1 + Math.random();
-    } else if (type === 'leaf') {
-      x = tx + (Math.random() - 0.5) * 50;
-      y = ty - 35 - Math.random() * 25;
-      vx = 0.08 + Math.random() * 0.2;
-      vy = 0.12 + Math.random() * 0.15;
-      maxLife = 180 + Math.random() * 180;
-      size = 1 + Math.random() * 0.5;
-    } else if (type === 'snow') {
-      x = Math.random() * W;
-      y = -2;
-      vx = (Math.random() - 0.5) * 0.08;
-      vy = 0.15 + Math.random() * 0.1;
-      maxLife = 400 + Math.random() * 200;
-      size = 1;
-    } else {
-      x = tx + (Math.random() - 0.5) * 60;
-      y = ty - 20 - Math.random() * 40;
-      vx = (Math.random() - 0.5) * 0.05;
-      vy = (Math.random() - 0.5) * 0.05;
-      maxLife = 100 + Math.random() * 100;
-      size = 1;
-    }
-
-    particles.push({
-      x, y, vx, vy, size,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      opacity: 0.6 + Math.random() * 0.4,
-      life: 0, maxLife,
-      wobble: Math.random() * Math.PI * 2,
-      wobbleSpeed: 0.02 + Math.random() * 0.03,
-    });
-  }
-
-  function updateParticles(pal: Pal, frame: number) {
-    const type = pal.particleType;
-    const maxP = type === 'snow' ? 40 : type === 'firefly' ? 12 : 25;
-    const spawnRate = type === 'snow' ? 6 : type === 'firefly' ? 20 : 10;
-
-    if (frame % spawnRate === 0 && particles.length < maxP) {
-      spawnParticle(pal);
-    }
-
-    for (let i = particles.length - 1; i >= 0; i--) {
-      const p = particles[i];
-      p.life++;
-      p.wobble += p.wobbleSpeed;
-
-      if (type === 'firefly') {
-        p.x += p.vx + Math.sin(p.wobble) * 0.1;
-        p.y += p.vy + Math.cos(p.wobble * 1.3) * 0.08;
-        p.opacity = 0.3 + Math.sin(p.life * 0.1) * 0.5;
-      } else {
-        p.x += p.vx + Math.sin(p.wobble) * 0.04;
-        p.y += p.vy;
-      }
-
-      const fadeAt = p.maxLife * 0.7;
-      if (p.life > fadeAt) {
-        p.opacity = Math.max(0, (1 - (p.life - fadeAt) / (p.maxLife - fadeAt)) * 0.8);
-      }
-
-      const groundY = hillY(Math.floor(p.x));
-      if (p.life > p.maxLife || p.y > groundY || p.x < -5 || p.x > W + 5) {
-        particles.splice(i, 1);
-        continue;
-      }
-
-      ctx.globalAlpha = Math.max(0, Math.min(1, p.opacity));
+    function drawPetal(p: Petal) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
       ctx.fillStyle = p.color;
-      const px1 = Math.floor(p.x);
-      const py1 = Math.floor(p.y);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
 
-      if (type === 'firefly') {
-        ctx.fillRect(px1, py1, 1, 1);
-        ctx.globalAlpha = p.opacity * 0.3;
-        ctx.fillRect(px1 - 1, py1, 1, 1);
-        ctx.fillRect(px1 + 1, py1, 1, 1);
-        ctx.fillRect(px1, py1 - 1, 1, 1);
-        ctx.fillRect(px1, py1 + 1, 1, 1);
-      } else if (p.size > 1.3) {
-        ctx.fillRect(px1, py1, 2, 1);
-        ctx.fillRect(px1 + (frame % 2), py1 + 1, 1, 1);
-      } else {
-        ctx.fillRect(px1, py1, 1, 1);
+    function tick() {
+      ctx.clearRect(0, 0, W, H);
+
+      if (petals.length < 22) petals.push(makePetal());
+
+      for (let i = petals.length - 1; i >= 0; i--) {
+        const p = petals[i];
+        p.wobble += p.wobbleSpeed;
+        p.x += p.vx + Math.sin(p.wobble) * 0.5;
+        p.y += p.vy;
+        p.rotation += p.rotSpeed;
+
+        // Dampen burst
+        p.vx *= 0.96;
+        p.vy  = p.vy * 0.96 + p.baseVy * 0.04;
+
+        // Fade near bottom
+        if (p.y > H * 0.75) p.opacity -= 0.015;
+
+        if (p.y > H + 8 || p.x < -16 || p.x > W + 16 || p.opacity <= 0) {
+          petals.splice(i, 1);
+          continue;
+        }
+        drawPetal(p);
       }
-      ctx.globalAlpha = 1;
+
+      rafId = requestAnimationFrame(tick);
     }
+
+    function shake() {
+      // Shake container
+      container.classList.remove('shaking');
+      void container.offsetWidth;
+      container.classList.add('shaking');
+      container.addEventListener('animationend', () => container.classList.remove('shaking'), { once: true });
+
+      // Burst existing + spawn new petals
+      petals.forEach(p => {
+        p.vx += (Math.random() - 0.5) * 7;
+        p.vy += (Math.random() - 0.7) * 5;
+        p.opacity = Math.min(1, p.opacity + 0.3);
+      });
+      for (let i = 0; i < 10; i++) petals.push(makePetal(true));
+    }
+
+    resize();
+    tick();
+
+    outer.addEventListener('click', shake);
+    outer.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') shake(); });
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(container);
+
+    document.addEventListener('astro:before-swap', () => {
+      cancelAnimationFrame(rafId);
+      ro.disconnect();
+    }, { once: true });
   }
-
-  // ── Main loop ──
-  let frameCount = 0;
-  let lastLabel = '';
-
-  function animate() {
-    frameCount++;
-    const pal = getCurrentPalette(frameCount);
-
-    if (pal.label !== lastLabel) {
-      lastLabel = pal.label;
-      seasonLabel.textContent = pal.label;
-    }
-
-    drawSky(pal);
-    drawHill(pal);
-    drawTree(pal);
-
-    // Update character
-    if (GUY.state === 'running') {
-      const speed = 0.35;
-      if (GUY.x < GUY.targetX) {
-        GUY.x += speed;
-      } else {
-        GUY.state = 'sitting';
-        GUY.x = GUY.targetX;
-      }
-    }
-    drawCharacter(pal, frameCount);
-
-    updateParticles(pal, frameCount);
-
-    requestAnimationFrame(animate);
-  }
-
-  animate();
 </script>

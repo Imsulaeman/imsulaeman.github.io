@@ -1,0 +1,228 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const allEssays = await getCollection('essays', ({ data }) => !data.draft);
+const essays = allEssays.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+
+<Base title="Writings — Ilham Maulana Sulaeman" description="Original essays on learning, building, and thinking.">
+  <main class="container">
+    <header class="header">
+      <nav class="nav">
+        <a href="/" class="nav-name">ilham</a>
+        <div class="nav-links">
+          <a href="/#projects">projects</a>
+          <a href="/writings" class="nav-active">writings</a>
+          <a href="/#shapes-me">what shapes me</a>
+        </div>
+      </nav>
+    </header>
+
+    <section class="writings-hero">
+      <h1 class="page-title">Writings</h1>
+      <p class="page-sub">Essays on learning, building, and thinking.</p>
+    </section>
+
+    <section class="essays-list">
+      {essays.length === 0 ? (
+        <p class="empty-state">Nothing published yet. Check back soon.</p>
+      ) : (
+        essays.map((essay, i) => (
+          <a
+            href={`/writings/${essay.id}`}
+            class="essay-row"
+            style={`--delay: ${i * 60}ms`}
+          >
+            <div class="essay-meta">
+              <time class="essay-date" datetime={essay.data.date.toISOString()}>
+                {formatDate(essay.data.date)}
+              </time>
+            </div>
+            <div class="essay-info">
+              <span class="essay-title">{essay.data.title}</span>
+              {essay.data.description && (
+                <p class="essay-desc">{essay.data.description}</p>
+              )}
+            </div>
+            <span class="essay-arrow">→</span>
+          </a>
+        ))
+      )}
+    </section>
+
+    <footer class="footer">
+      <p>&copy; 2026 Ilham Maulana Sulaeman</p>
+    </footer>
+  </main>
+</Base>
+
+<style>
+  .header {
+    padding: 32px 0;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .nav-name {
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    color: var(--text);
+    display: inline-block;
+    transition: color 0.2s, transform 0.2s var(--ease-out-expo);
+  }
+
+  .nav-name:hover {
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 24px;
+    font-size: 12px;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    display: inline-block;
+    transition: color 0.2s, transform 0.2s var(--ease-out-expo);
+  }
+
+  .nav-links a:hover {
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+
+  .nav-active {
+    color: var(--text) !important;
+    font-weight: 500;
+  }
+
+  /* ── Page hero ── */
+  .writings-hero {
+    padding: 48px 0 16px;
+  }
+
+  .page-title {
+    font-family: var(--font-serif);
+    font-size: clamp(28px, 6vw, 48px);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .page-sub {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ── Essays list ── */
+  .essays-list {
+    padding: 48px 0 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .empty-state {
+    color: var(--muted);
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  .essay-row {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--text);
+    transition: background 0.2s;
+    position: relative;
+  }
+
+  .essay-row:first-child {
+    border-top: 1px solid var(--border);
+  }
+
+  .essay-meta {
+    flex-shrink: 0;
+    width: 140px;
+  }
+
+  .essay-date {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .essay-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .essay-title {
+    font-size: 14px;
+    font-weight: 500;
+    display: block;
+    transition: color 0.2s;
+  }
+
+  .essay-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  .essay-arrow {
+    color: var(--muted);
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: transform 0.2s var(--ease-out-expo), color 0.2s;
+  }
+
+  .essay-row:hover .essay-title {
+    color: var(--accent);
+  }
+
+  .essay-row:hover .essay-arrow {
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+
+  /* ── Footer ── */
+  .footer {
+    padding: 32px 0;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .essay-meta {
+      display: none;
+    }
+
+    .nav-links {
+      gap: 16px;
+    }
+  }
+</style>
