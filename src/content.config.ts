@@ -5,7 +5,7 @@ const essays = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/essays' }),
   schema: z.object({
     title: z.string(),
-    date: z.coerce.date(),
+    date: z.string(),
     description: z.string().optional(),
     draft: z.boolean().default(false),
   }),

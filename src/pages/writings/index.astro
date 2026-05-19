@@ -3,10 +3,10 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 
 const allEssays = await getCollection('essays', ({ data }) => !data.draft);
-const essays = allEssays.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const essays = allEssays.sort((a, b) => b.data.date.localeCompare(a.data.date));
 
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+function formatDate(date: string): string {
+  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 ---
 
@@ -39,7 +39,7 @@ function formatDate(date: Date): string {
             style={`--delay: ${i * 60}ms`}
           >
             <div class="essay-meta">
-              <time class="essay-date" datetime={essay.data.date.toISOString()}>
+              <time class="essay-date" datetime={essay.data.date}>
                 {formatDate(essay.data.date)}
               </time>
             </div>

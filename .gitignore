@@ -30,4 +30,6 @@ CLAUDE.md
 skills-lock.json
 # essay drafts / templates
 src/content/essays/template.md
+src/content/essays/`template`.md
+src/content/essays/TBDtitleyet.md
 src/content/essays/drafts/

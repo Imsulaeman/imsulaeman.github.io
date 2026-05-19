@@ -1,6 +1,6 @@
 ---
 title: "On Building Tools You Wish Existed"
-date: 2026-05-16
+date: "2026-05-16"
 description: "Why the best projects start from personal frustration, and why that frustration is a feature."
 draft: false
 ---

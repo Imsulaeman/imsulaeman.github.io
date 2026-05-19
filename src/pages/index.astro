@@ -5,11 +5,11 @@ import Sakura from '../components/Sakura.astro';
 
 const allEssays = await getCollection('essays', ({ data }) => !data.draft);
 const recentEssays = allEssays
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .sort((a, b) => b.data.date.localeCompare(a.data.date))
   .slice(0, 3);
 
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+function formatDate(date: string): string {
+  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 ---
 

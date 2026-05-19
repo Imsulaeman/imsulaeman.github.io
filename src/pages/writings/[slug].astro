@@ -13,8 +13,8 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+function formatDate(date: string): string {
+  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 ---
 
@@ -38,7 +38,7 @@ function formatDate(date: Date): string {
         {entry.data.description && (
           <p class="essay-desc">{entry.data.description}</p>
         )}
-        <time class="essay-date" datetime={entry.data.date.toISOString()}>
+        <time class="essay-date" datetime={entry.data.date}>
           {formatDate(entry.data.date)}
         </time>
       </header>
