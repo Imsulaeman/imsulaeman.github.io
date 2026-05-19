@@ -53,6 +53,7 @@ img {
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -161,7 +162,7 @@ section:first-of-type {
 
 /* ── Mobile ── */
 @media (max-width: 600px) {
-  .container   { padding: 0 16px; }
+  .container   { padding: 0; }
   section      { padding: 56px 0; }
   #projects    { padding: 64px 0; }
   #writings    { padding: 48px 0; }
