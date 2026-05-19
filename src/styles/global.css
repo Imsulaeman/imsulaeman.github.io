@@ -162,7 +162,7 @@ section:first-of-type {
 
 /* ── Mobile ── */
 @media (max-width: 600px) {
-  .container   { padding: 0; }
+  .container   { padding: 0 24px; }
   section      { padding: 56px 0; }
   #projects    { padding: 64px 0; }
   #writings    { padding: 48px 0; }
