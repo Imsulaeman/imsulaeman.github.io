@@ -39,7 +39,7 @@ function formatDate(date: Date): string {
       <p class="hero-bio">
         A life-long learner studying at Bina Nusantara University.
         I build tools, read deeply, and tend a
-        <a href="/garden">second brain</a> where ideas connect.
+        <a href="https://second-brain-site-eta.vercel.app/" target="_blank" rel="noopener">second brain</a> where ideas connect.
         Based in Bandung, Indonesia.
       </p>
 
@@ -85,6 +85,27 @@ function formatDate(date: Date): string {
           </div>
         </a>
       </div>
+
+      <div class="project-item reveal" style="--delay: 160ms">
+        <a href="https://second-brain-site-eta.vercel.app/" class="project-card" target="_blank" rel="noopener">
+          <div class="project-card-header">
+            <span class="project-name">Second Brain</span>
+            <span class="project-arrow">↗</span>
+          </div>
+          <p class="project-desc">
+            A personal knowledge base themed as a Memory Palace. Built on an Obsidian
+            vault — browse interconnected notes on learning, decision-making, and AI.
+            Features a live knowledge graph and full-text fuzzy search.
+          </p>
+          <div class="project-tags">
+            <span>Next.js</span>
+            <span>MDX</span>
+            <span>D3</span>
+            <span>Tailwind</span>
+            <span>Fuse.js</span>
+          </div>
+        </a>
+      </div>
     </section>
 
     <!-- Writings -->
@@ -93,7 +114,7 @@ function formatDate(date: Date): string {
 
       {recentEssays.length === 0 ? (
         <p class="placeholder-text reveal" style="--delay: 80ms">
-          Coming soon. Original essays on learning, building, and thinking.
+        Original essays on learning, building, financial and thinking.
         </p>
       ) : (
         <div class="essays-preview">
@@ -120,15 +141,24 @@ function formatDate(date: Date): string {
       <div class="section-label reveal">03 what shapes me</div>
 
       <div class="influence-item reveal" style="--delay: 0ms">
-        <span class="influence-title">A Mind for Numbers</span>
+        <span class="influence-title"><a href="https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299" target="_blank" rel="noopener noreferrer">Atomic Habits</a></span>
+        <p class="influence-desc">
+          James Clear on the system behind behavior change. Small habits compound —
+          identity shapes action, action shapes identity. The book that made me
+          think in systems instead of goals.
+        </p>
+      </div>
+
+      <div class="influence-item reveal" style="--delay: 80ms">
+        <span class="influence-title"><a href="https://www.amazon.com/Mind-Numbers-Science-Flunked-Algebra/dp/039916524X" target="_blank" rel="noopener noreferrer">A Mind for Numbers</a></span>
         <p class="influence-desc">
           Barbara Oakley on how the brain actually learns. Focused vs diffuse
           thinking, chunking, and why retrieval practice beats rereading.
         </p>
       </div>
 
-      <div class="influence-item reveal" style="--delay: 80ms">
-        <span class="influence-title">Howard Marks — Second-Level Thinking</span>
+      <div class="influence-item reveal" style="--delay: 160ms">
+        <span class="influence-title"><a href="https://www.amazon.com/most-important-thing-Howard-Marks/dp/9353022797" target="_blank" rel="noopener noreferrer">The Most Important Thing</a></span>
         <p class="influence-desc">
           Thinking past the obvious. Every action has consequences,
           and those consequences have consequences. The foundation
@@ -136,24 +166,17 @@ function formatDate(date: Date): string {
         </p>
       </div>
 
-      <div class="influence-item reveal" style="--delay: 160ms">
-        <span class="influence-title">Naval Ravikant — Specific Knowledge</span>
-        <p class="influence-desc">
-          Build what only you can build. Leverage code, media, and
-          capital to scale judgment. Productize yourself.
-        </p>
-      </div>
-
       <div class="influence-item reveal" style="--delay: 240ms">
-        <span class="influence-title">Dan Koe — Writing as Thinking</span>
+        <span class="influence-title"><a href="https://www.navalmanack.com/almanack-of-naval-ravikant/table-of-contents" target="_blank" rel="noopener noreferrer">The Almanack of Naval Ravikant</a></span>
         <p class="influence-desc">
-          Essays are the last form of real thinking. Articulation
-          creates clarity. The meaning economy rewards depth.
+          How I learned to value leverage — maybe I didn't realize it but I've been
+          applying it in my life for a while. Leverage is the force multiplier of
+          effort, and the key to scale.
         </p>
       </div>
 
       <p class="garden-cta reveal" style="--delay: 320ms">
-        These ideas live in my second brain —
+        These ideas live in my <a href="https://second-brain-site-eta.vercel.app/" target="_blank" rel="noopener noreferrer">second brain</a> —
         a growing collection of concepts, sources, and synthesis.
       </p>
     </section>
@@ -427,16 +450,20 @@ function formatDate(date: Date): string {
   .influence-title {
     font-size: 14px;
     font-weight: 600;
+    display: inline-block;
+  }
+
+  .influence-title a {
+    color: var(--text);
     text-decoration: underline;
     text-underline-offset: 3px;
     text-decoration-color: var(--border);
-    cursor: default;
-    display: inline-block;
-    transition: color var(--duration-base);
+    transition: color var(--duration-base), text-decoration-color var(--duration-base);
   }
 
-  .influence-title:hover {
+  .influence-title a:hover {
     color: var(--accent);
+    text-decoration-color: var(--accent);
   }
 
   .influence-desc {

@@ -94,21 +94,13 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .globe-container.shaking {
-      animation: none;
-    }
-    .petal-canvas {
-      display: none;
-    }
-    .globe-hint {
-      display: none;
-    }
+    .globe-container.shaking { animation: none; }
+    .petal-canvas { display: none; }
+    .globe-hint { display: none; }
   }
 
   @media (max-width: 600px) {
-    .globe-container {
-      max-width: 100%;
-    }
+    .globe-container { max-width: 100%; }
   }
 </style>
 
@@ -184,11 +176,9 @@
         p.y += p.vy;
         p.rotation += p.rotSpeed;
 
-        // Dampen burst
         p.vx *= 0.96;
         p.vy  = p.vy * 0.96 + p.baseVy * 0.04;
 
-        // Fade near bottom
         if (p.y > H * 0.75) p.opacity -= 0.015;
 
         if (p.y > H + 8 || p.x < -16 || p.x > W + 16 || p.opacity <= 0) {
@@ -202,13 +192,11 @@
     }
 
     function shake() {
-      // Shake container
       container.classList.remove('shaking');
       void container.offsetWidth;
       container.classList.add('shaking');
       container.addEventListener('animationend', () => container.classList.remove('shaking'), { once: true });
 
-      // Burst existing + spawn new petals
       petals.forEach(p => {
         p.vx += (Math.random() - 0.5) * 7;
         p.vy += (Math.random() - 0.7) * 5;

@@ -26,5 +26,8 @@ pnpm-debug.log*
 # claude / agent tooling
 .claude/
 .agents/
+CLAUDE.md
 skills-lock.json
-public/assets/*.mp4
+# essay drafts / templates
+src/content/essays/template.md
+src/content/essays/drafts/
