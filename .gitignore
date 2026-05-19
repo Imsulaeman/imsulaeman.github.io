@@ -33,3 +33,7 @@ src/content/essays/template.md
 src/content/essays/`template`.md
 src/content/essays/TBDtitleyet.md
 src/content/essays/drafts/
+
+# large source video / intermediate files
+public/assets/Reading-animated.mp4
+public/assets/looped.gif

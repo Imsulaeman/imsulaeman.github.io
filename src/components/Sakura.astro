@@ -4,17 +4,11 @@
 
 <div class="globe-outer" id="globe-outer" role="button" aria-label="Click to shake" tabindex="0">
   <div class="globe-container" id="globe-container">
-    <video
-      autoplay
-      muted
-      loop
-      playsinline
-      preload="metadata"
-      class="reading-video"
-      aria-hidden="true"
-    >
-      <source src="/assets/Reading-animated.mp4" type="video/mp4" />
-    </video>
+    <div class="frame-stack">
+      <img src="/assets/loop/frames 1.png" alt="" class="frame active" aria-hidden="true" />
+      <img src="/assets/loop/frames 2.png" alt="" class="frame"        aria-hidden="true" />
+      <img src="/assets/loop/frames 3.png" alt="" class="frame"        aria-hidden="true" />
+    </div>
     <canvas class="petal-canvas" id="petal-canvas" aria-hidden="true"></canvas>
   </div>
   <p class="globe-hint">click to shake</p>
@@ -54,10 +48,27 @@
     animation: globe-shake 0.55s var(--ease-out-expo);
   }
 
-  .reading-video {
+  .frame-stack {
+    position: relative;
+    width: 100%;
+    display: block;
+  }
+
+  .frame {
     width: 100%;
     height: auto;
     display: block;
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+  }
+
+  .frame:first-child {
+    position: relative;
+  }
+
+  .frame.active {
+    opacity: 1;
   }
 
   .petal-canvas {
@@ -110,6 +121,15 @@
     const outer     = document.getElementById('globe-outer')!;
     const container = document.getElementById('globe-container')!;
     const canvas    = document.getElementById('petal-canvas') as HTMLCanvasElement;
+    const frames    = Array.from(container.querySelectorAll<HTMLImageElement>('.frame'));
+
+    let frameIdx = 0;
+
+    function setFrame(i: number) {
+      frames[frameIdx].classList.remove('active');
+      frameIdx = i;
+      frames[frameIdx].classList.add('active');
+    }
     const ctx       = canvas.getContext('2d')!;
 
     const COLORS = ['#ffc0cb', '#ffb7c5', '#f4a7b9', '#f8d0d8', '#ffe0e8'];
@@ -191,11 +211,26 @@
       rafId = requestAnimationFrame(tick);
     }
 
+    let cycleStep = 0;
+    let intervalId = 0;
+
     function shake() {
       container.classList.remove('shaking');
       void container.offsetWidth;
       container.classList.add('shaking');
-      container.addEventListener('animationend', () => container.classList.remove('shaking'), { once: true });
+
+      clearInterval(intervalId);
+      cycleStep = 0;
+      intervalId = window.setInterval(() => {
+        setFrame(cycleStep === 0 ? 1 : 2);
+        cycleStep = cycleStep === 0 ? 1 : 0;
+      }, 80);
+
+      container.addEventListener('animationend', () => {
+        container.classList.remove('shaking');
+        clearInterval(intervalId);
+        setFrame(0);
+      }, { once: true });
 
       petals.forEach(p => {
         p.vx += (Math.random() - 0.5) * 7;
