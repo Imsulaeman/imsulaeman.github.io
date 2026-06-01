@@ -37,3 +37,9 @@ src/content/essays/drafts/
 # large source video / intermediate files
 public/assets/Reading-animated.mp4
 public/assets/looped.gif
+
+# academy application files (PDFs, HTML sources, guide)
+IlhamMaulanaSulaeman_CV_Academy.*
+IlhamMaulanaSulaeman_Portfolio_Academy.*
+"Portfolio Guidance for Apple Developer Academy Indonesia.pdf"
+ACADEMY_GUIDE.md
