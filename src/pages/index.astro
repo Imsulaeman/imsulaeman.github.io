@@ -106,6 +106,40 @@ function formatDate(date: string): string {
           </div>
         </a>
       </div>
+
+      <div class="project-item reveal" style="--delay: 240ms">
+        <a href="https://github.com/Imsulaeman/Rutin" class="project-card" target="_blank" rel="noopener">
+          <div class="project-card-header">
+            <span class="project-name">Rutin</span>
+            <span class="project-arrow">↗</span>
+          </div>
+          <p class="project-desc">
+            Built while managing my own TB treatment — 6+ months of daily doses where a missed intake
+            can cause drug resistance. Every existing app was too generic or unreliable when it mattered most,
+            so I built the one I needed.
+          </p>
+          <ul class="project-features">
+            <li><strong>Medicine reminders</strong> — alarm-grade, re-notifies every minute until confirmed. Full-screen takeover that survives notification dismissal and phone reboots.</li>
+            <li><strong>Water tracking</strong> — interval reminders within a configurable active window, WHO-based daily target, live countdown to next reminder.</li>
+            <li><strong>Daily habits</strong> — multiple reminder times per habit, streak tracking with partial-day survival, habit stacking into routines with shared streak.</li>
+            <li><strong>Sleep mode + morning gate</strong> — detects sleep passively via screen-off timing. On unlock, shows a morning dashboard before the phone is usable, then a rotating wake-up game (Sequence Memory, Tap Rhythm, Connect the Colors). Home button is intercepted via AccessibilityService — you can't skip it.</li>
+            <li><strong>Treatment program</strong> — tracks long-term schedules (TB, Tifus, Malaria, ARV, chemo). Day counter, adherence score, PDF export.</li>
+            <li><strong>Medals</strong> — personal records for water intake, medicine streak, and habit streak. PR-only tracking, never resets on a break.</li>
+          </ul>
+          <p class="project-desc" style="margin-top: 10px; margin-bottom: 12px;">
+            Offline-first, free forever. All sensitive data encrypted on-device with Hive + AES cipher. Currently in internal testing on Play Store.
+          </p>
+          <div class="project-tags">
+            <span>Flutter</span>
+            <span>Dart</span>
+            <span>Kotlin</span>
+            <span>Android</span>
+            <span>Riverpod</span>
+            <span>Hive</span>
+            <span>Firebase</span>
+          </div>
+        </a>
+      </div>
     </section>
 
     <!-- Writings -->
@@ -346,6 +380,22 @@ function formatDate(date: string): string {
     font-size: 13px;
     line-height: 1.7;
     margin-bottom: 12px;
+  }
+
+  .project-features {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 10px 0 0 0;
+    padding-left: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .project-features li strong {
+    color: var(--text);
+    font-weight: 600;
   }
 
   .project-tags {
