@@ -1,16 +1,19 @@
 # imsulaeman.me
 
-Personal site — projects, essays, and things that shaped how I think.
+[Live site](https://imsulaeman.me) — Bandung, Indonesia.
+
+I read a lot about finance and investing. On the side I build tools when something bothers me enough.
+
+---
 
 ## Projects
 
-- **[Folio](https://imsulaeman.me/Folio)** — offline study companion
-- **[Second Brain](https://brain.imsulaeman.me)** — personal knowledge garden
-- **[Rutin](https://github.com/Imsulaeman/Rutin)** — Android health app
+**[Folio](https://imsulaeman.me/Folio)** — I was learning Japanese and kept switching between the textbook and my phone just to hear the audio. That was annoying, so I built a study tool that keeps everything in one tab.
 
-## Running locally
+**[Second Brain](https://brain.imsulaeman.me)** — My Obsidian vault made public. Mental models across investing, learning, thinking, AI, and whatever else I find interesting. Inspired by Karpathy's LLM-wiki.
 
-```sh
-npm install
-npm run dev    # localhost:4321
-```
+**[Rutin](https://github.com/Imsulaeman/Rutin)** — I have TB. Missing a dose can cause drug resistance. Built an Android app with alarms that ring every minute until you confirm intake — and a morning gate with wake-up games so you can't just dismiss and scroll.
+
+## Essays
+
+Original writing on learning, finance, and thinking — [imsulaeman.me/writings](https://imsulaeman.me/writings).
