@@ -9,7 +9,11 @@ The best reason to build something is embarrassingly simple: it doesn't exist, a
 
 Not "the market needs it." Not "this will scale." Just — I kept hitting this wall, and I got tired of it.
 
-That's how Folio started. I read a lot. PDFs, EPUBs, long articles saved for later. Every tool I tried made tradeoffs I didn't want to make: either my data lived in someone else's cloud, or the reading experience was bad, or note-taking felt bolted on as an afterthought. So I built the thing I actually wanted to use.
+That's how Folio started. I was learning Japanese. I found [Genki](https://genki3.japantimes.co.jp/en/intro/) — the book most people recommend — and [Tofugu](https://www.tofugu.com/learn-japanese/) for the free side. Good materials. But Genki's audio is separated: you read the book, hit an audio section, then switch to your phone, open the app, find the track. It works — plenty of people learned that way. For me, it was too easy to get distracted the moment the phone was in my hand.
+
+So I built Folio. Upload your PDF and audio together, study in one place, no switching. Then I found Barbara Oakley's [Learning How to Learn](https://www.coursera.org/learn/learning-how-to-learn) and started thinking about *how* I was studying, not just *what*. I added Spaced Repetition (same algorithm as Anki) and a Pomodoro timer. Then I added Anki flashcard import because I noticed people were already using Anki alongside their PDFs. One friction led to another fix. It was never a one-night story.
+
+![The missing workflow](assets/the%20missing%20workflow.png)
 
 There's something clarifying about building for yourself. You know exactly when it's working because you feel it. No user research needed. Your own frustration is the spec.
 
