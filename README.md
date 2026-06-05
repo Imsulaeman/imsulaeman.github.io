@@ -4,6 +4,10 @@
 
 I read a lot about finance and investing. On the side I build tools when something bothers me enough.
 
+## About
+
+Student at Bina Nusantara University. I read deeply, tend a second brain, and build things when I hit a problem no existing tool solves well enough. Most of what I make is for myself first.
+
 ---
 
 ## Projects
