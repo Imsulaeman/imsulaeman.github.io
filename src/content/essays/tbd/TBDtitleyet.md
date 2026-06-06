@@ -2,11 +2,11 @@
 title: ""
 date: "2026-06-01"
 description: ""
-draft: false
+draft: true
 ---
 
 ## Opening
-<insert ![narrow sky](<assets/a-frogs-on-the-bottom-of-well.png>)>
+![narrow sky](<assets/a-frogs-on-the-bottom-of-well.png>)>
 I was a frog at the bottom of a well looking up at a small square of sky, because that was I really know.
 People say boarden your view with 
 
