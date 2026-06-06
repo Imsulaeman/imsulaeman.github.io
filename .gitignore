@@ -1,5 +1,8 @@
 # build output
 dist/
+
+# image compression manifest
+.compress-manifest.json
 # generated types
 .astro/
 

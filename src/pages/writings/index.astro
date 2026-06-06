@@ -34,7 +34,7 @@ function formatDate(date: string): string {
       ) : (
         essays.map((essay, i) => (
           <a
-            href={`/writings/${essay.id}`}
+            href={`/writings/${essay.id.includes('/') ? essay.id.split('/')[0] : essay.id}`}
             class="essay-row"
             style={`--delay: ${i * 60}ms`}
           >
