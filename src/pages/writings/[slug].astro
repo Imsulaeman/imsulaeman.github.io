@@ -235,4 +235,110 @@ function formatDate(date: string): string {
       gap: 16px;
     }
   }
+
+  /* ── Lightbox ── */
+  .essay-body :global(img) {
+    cursor: zoom-in;
+    border-radius: 4px;
+    max-width: 100%;
+  }
+
+  #lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    cursor: zoom-in;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #lightbox.open {
+    display: flex;
+  }
+
+  #lightbox.zoomed {
+    cursor: zoom-out;
+    overflow: auto;
+  }
+
+  #lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 4px;
+    transition: transform 0.25s var(--ease-out-expo);
+    transform-origin: center center;
+    user-select: none;
+    cursor: zoom-in;
+  }
+
+  #lightbox.zoomed img {
+    max-width: none;
+    max-height: none;
+    transform: scale(2);
+    cursor: zoom-out;
+  }
+
+  #lightbox-close {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    color: rgba(255,255,255,0.7);
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    transition: color 0.15s;
+  }
+
+  #lightbox-close:hover {
+    color: #fff;
+  }
 </style>
+
+<div id="lightbox">
+  <button id="lightbox-close" aria-label="Close">✕</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<script>
+  const lightbox = document.getElementById('lightbox')!;
+  const lbImg = document.getElementById('lightbox-img') as HTMLImageElement;
+  const lbClose = document.getElementById('lightbox-close')!;
+
+  function open(src: string, alt: string) {
+    lbImg.src = src;
+    lbImg.alt = alt;
+    lightbox.classList.add('open');
+    lightbox.classList.remove('zoomed');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function close() {
+    lightbox.classList.remove('open', 'zoomed');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll<HTMLImageElement>('.essay-body img').forEach((img) => {
+    img.addEventListener('click', () => open(img.src, img.alt));
+  });
+
+  lbImg.addEventListener('click', (e) => {
+    e.stopPropagation();
+    lightbox.classList.toggle('zoomed');
+  });
+
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) close();
+  });
+
+  lbClose.addEventListener('click', close);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close();
+  });
+</script>
