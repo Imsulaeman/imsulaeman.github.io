@@ -242,7 +242,6 @@
     }
 
     resize();
-    tick();
 
     outer.addEventListener('click', shake);
     outer.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') shake(); });
@@ -250,9 +249,21 @@
     const ro = new ResizeObserver(resize);
     ro.observe(container);
 
+    // ponytail: pause RAF when hero is off-screen to avoid scroll jank
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        if (!rafId) rafId = requestAnimationFrame(tick);
+      } else {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+    });
+    io.observe(container);
+
     document.addEventListener('astro:before-swap', () => {
       cancelAnimationFrame(rafId);
       ro.disconnect();
+      io.disconnect();
     }, { once: true });
   }
 </script>
