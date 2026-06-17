@@ -5,6 +5,7 @@ description: "AI is making polymaths possible again. We are in the 1440s. Most p
 draft: false
 ---
 ![Michelangelo, Creation of Adam (cropped)](assets/Michelangelo_-_Creation_of_Adam_(cropped).jpg)
+<small>Michelangelo, The Creation of Adam — Sistine Chapel, 1512</small>
 
 I don't remember where I first picked this up. But the idea stuck.
 
@@ -41,7 +42,14 @@ That is the Renaissance condition: knowledge accessible enough that one person c
 ---
 
 ![AI adoption by population](assets/ai-cluster.jpg)
-*Source: [Insanely Cool Tools](https://insanelycooltools.substack.com/p/insanely-cool-tools-substack-edition-edc)*
+<small>Source: [Insanely Cool Tools](https://insanelycooltools.substack.com/p/insanely-cool-tools-substack-edition-edc)</small>
+
+Each dot is 3.2 million people. The whole image is 8.1 billion humans.
+
+The red sliver — the people paying for AI tools, reading about it, arguing about it — is roughly 0.06% of that. It feels crowded because everyone in your feed is inside that sliver.
+
+The other 99.94% have not started yet.
+
 ---
 
 The first Renaissance took decades to propagate. The printing press was invented in the 1440s. The full flowering came a generation later, as the books spread and people learned what to do with them.
