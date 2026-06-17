@@ -9,9 +9,11 @@ draft: false
 
 I don't remember where I first picked this up. But the idea stuck.
 
-The Renaissance happened because knowledge became accessible. Before Gutenberg's press, knowledge lived in monasteries and courts. To learn, you needed proximity to the people who already knew. That made specialization not a choice but a constraint: you learned what was available near you.
+The Renaissance happened because knowledge was accessible, and because specialization hadn't been invented yet.
 
-The press changed the equation. Books traveled. Knowledge crossed geography and discipline. And suddenly you had people like Da Vinci: painter, engineer, anatomist, architect. Michelangelo: sculptor, poet, architect. People who moved across disciplines not because they were uniquely gifted, but because the knowledge to do so was available to them for the first time.
+Before Gutenberg's press, knowledge lived in monasteries and courts. To learn, you needed proximity to the people who already knew. Italian workshops, the bottega, broke that locally: Michelangelo entered Ghirlandaio's at thirteen, grinding pigments before he ever touched a fresco. Da Vinci trained under Verrocchio the same way. They weren't polymaths because they were uniquely gifted. Being a generalist was just how training worked.
+
+Then the press removed the distance. Books traveled. Galileo could read Copernicus without ever meeting him. A generation later, you didn't need to be born near the right workshop.
 
 The generalist was not rare in the Renaissance. The generalist was the *product* of the Renaissance.
 
