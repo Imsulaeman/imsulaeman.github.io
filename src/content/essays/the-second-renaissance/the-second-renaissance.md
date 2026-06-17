@@ -11,7 +11,7 @@ I don't remember where I first picked this up. But the idea stuck.
 
 The Renaissance happened because knowledge was accessible, and because specialization hadn't been invented yet.
 
-Before Gutenberg's press, knowledge lived in monasteries and courts. To learn, you needed proximity to the people who already knew. Italian workshops, the bottega, broke that locally: Michelangelo entered Ghirlandaio's at thirteen, grinding pigments before he ever touched a fresco. Da Vinci trained under Verrocchio the same way. They weren't polymaths because they were uniquely gifted. Being a generalist was just how training worked.
+Before Gutenberg's press, knowledge lived in monasteries and courts. To learn, you needed proximity to the people who already knew. Italian workshops, [the bottega](https://thecultural.me/articles/the-renaissance-bottega-and-intergenerational-skill-transfer-through-the-hand-of-the-master-683627), broke that locally: Michelangelo entered Ghirlandaio's at thirteen, grinding pigments before he ever touched a fresco. Da Vinci trained under Verrocchio the same way. They weren't polymaths because they were uniquely gifted. Being a generalist was just how training worked.
 
 Then the press removed the distance. Books traveled. Galileo could read Copernicus without ever meeting him. A generation later, you didn't need to be born near the right workshop.
 
