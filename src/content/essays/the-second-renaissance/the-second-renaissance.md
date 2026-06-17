@@ -40,7 +40,7 @@ That is the Renaissance condition: knowledge accessible enough that one person c
 
 ---
 
-![AI adoption by population](assets/ai-cluster.jfif)
+![AI adoption by population](assets/ai-cluster.jpg)
 *Source: [Insanely Cool Tools](https://insanelycooltools.substack.com/p/insanely-cool-tools-substack-edition-edc)*
 ---
 
