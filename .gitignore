@@ -44,5 +44,12 @@ public/assets/looped.gif
 # academy application files (PDFs, HTML sources, guide)
 IlhamMaulanaSulaeman_CV_Academy.*
 IlhamMaulanaSulaeman_Portfolio_Academy.*
-"Portfolio Guidance for Apple Developer Academy Indonesia.pdf"
+Portfolio Guidance for Apple Developer Academy Indonesia.pdf
 ACADEMY_GUIDE.md
+NamaLengkap_*
+ADA-spec/
+ADA_SPEC.md
+SESSION_LOG.md
+
+# alternate favicon drafts
+public/favicon1.svg
