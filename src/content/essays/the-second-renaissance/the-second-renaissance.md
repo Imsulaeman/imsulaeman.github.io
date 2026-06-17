@@ -20,7 +20,7 @@ Then we industrialized, and the factory model won, not just for manufacturing, b
 
 Schools started producing specialists by design. Universities divided into faculties. Careers narrowed into tracks. The logic made sense: complex systems needed deep experts. You could not afford a hospital where doctors also designed the building.
 
-But the cost was invisible. We stopped producing people who could see across things. We started calling the ability to connect disciplines "creativity" and treating it like a personality trait, something you either had or didn't, rather than what it actually is: a skill that knowledge access enables. Ken Robinson argued the same in [Do Schools Kill Creativity?](https://brain.imsulaeman.me/note/sources/do-schools-kill-creativity): creativity is not unevenly distributed, it gets educated out of people.
+But the cost was invisible. We stopped producing people who could see across things. We started calling the ability to connect disciplines "creativity" and treating it like a personality trait, something you either had or didn't, rather than what it actually is: a skill that knowledge access enables. Ken Robinson made this case in [Do Schools Kill Creativity?](https://brain.imsulaeman.me/note/sources/do-schools-kill-creativity): the education system didn't select against creative people, it produced uncreative ones.
 
 The Renaissance generalist did not disappear because humans changed. They disappeared because the system stopped creating the conditions for them.
 
