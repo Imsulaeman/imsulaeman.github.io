@@ -30,7 +30,7 @@ I am not a developer.
 
 I study information systems at Binus. I cannot write a product yet. But in the last 3 months I built Rutin: a full Android health app with alarm-grade medicine reminders, a sleep detection foreground service written in Kotlin, a morning gate you cannot skip, and wake-up games that run before your phone becomes usable.
 
-I built it because I have tuberculosis. A missed dose can cause drug resistance. I needed something that worked and nothing existing did. As I wrote about [last month](/essays/on-building-tools-you-wish-existed), the best tools start from personal frustration.
+I built it because I have tuberculosis. A missed dose can cause drug resistance. I needed something that worked and nothing existing did. As I wrote about [last month](/writings/on-building-tools-you-wish-existed), the best tools start from personal frustration.
 
 A few years ago, building that would have required a team. A Flutter developer. A Kotlin developer for the native Android services. A UX designer. A product manager. The knowledge lived in separate silos. You needed a specialist in each one.
 
