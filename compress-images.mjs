@@ -4,6 +4,7 @@ import { createHash } from "crypto";
 import { join, extname, basename } from "path";
 
 const ESSAYS_DIR = "src/content/essays";
+const LOOP_DIR = "public/assets/loop";
 const MANIFEST = ".compress-manifest.json";
 const QUALITY = 80;
 const EXTS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
@@ -60,6 +61,27 @@ function kb(bytes) {
   return `${(bytes / 1024).toFixed(1)}KB`;
 }
 
+async function convertLoopFrames(manifest) {
+  const entries = await readdir(LOOP_DIR);
+  const pngs = entries.filter(f => extname(f).toLowerCase() === '.png');
+  for (const name of pngs) {
+    const png = join(LOOP_DIR, name);
+    const webp = png.replace(/\.png$/i, '.webp');
+    const key = `loop:${name}`;
+    const h = await hash(png);
+    if (manifest[key] === h) {
+      console.log(`  ${name.replace('.png', '.webp')}: unchanged, skipped`);
+      continue;
+    }
+    const before = (await stat(png)).size;
+    await sharp(png).resize(960).webp({ quality: 82 }).toFile(webp);
+    const after = (await stat(webp)).size;
+    const saved = (((before - after) / before) * 100).toFixed(1);
+    console.log(`  ${name.replace('.png', '.webp')}: ${kb(before)} → ${kb(after)} (${saved}% saved)`);
+    manifest[key] = h;
+  }
+}
+
 let manifest = {};
 try {
   manifest = JSON.parse(await readFile(MANIFEST, "utf8"));
@@ -72,5 +94,9 @@ if (images.length === 0) {
   console.log(`compress-images: found ${images.length} image(s)`);
   const results = await Promise.all(images.map((f) => compress(f, manifest)));
   for (const { file, hash: h } of results) manifest[file] = h;
-  await writeFile(MANIFEST, JSON.stringify(manifest, null, 2));
 }
+
+console.log("compress-images: converting loop frames to WebP");
+await convertLoopFrames(manifest);
+
+await writeFile(MANIFEST, JSON.stringify(manifest, null, 2));
